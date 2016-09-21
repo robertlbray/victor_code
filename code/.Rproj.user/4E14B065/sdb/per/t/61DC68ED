@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "source('modules/Classes/Estimators.R')\n\nrunEstimators <- function(){\n  my.computer <- 1\n  expand.grid(\n    dirichlet.alpha = c(.01, 1),\n    num.theta = 2,\n    num.actions = c(2, 6),\n    num.states = \n      seq(100, 1000, length.out = 200) %>%\n      as.integer\n  ) %>% \n    mt(random.seed = 10^4 * my.computer + sample(n())) %>%\n    d_('random.seed', function(s){\n      set.seed(s$random.seed)\n      \n      Estimators$new(\n        beta = .999,\n        dirichlet.alpha = s$dirichlet.alpha,\n        num.theta = s$num.theta,\n        num.actions = s$num.actions,\n        num.states = s$num.states, \n        num.obs = 300\n      ) %>% {\n        .$initializeEstimators() \n        # if(s$num.states < 3000) .$runNFXP_timed()\n        # .$runNPL_timed()\n        .$runSNFXP_timed()\n        .$runSNPL_timed()\n        .$runSNPL2_timed()\n        list(\n          experiment = s,\n          times = .$times,\n          theta = .$theta\n        )\n      } %>%\n        se(s$random.seed, loc = experimentSave)\n    }, .parallel = TRUE)\n}\n\ncounterfactualAnalysis <- function(){\n  my.trial <- 9\n  \n  expand.grid(\n    dirichlet.alpha = c(.01, 1),\n    num.theta = 2,\n    num.actions = c(2, 6),\n    num.states = 48000\n  ) %>% \n    ag(num.states) %>%\n    mt(random.seed = row_number()) %>% \n    d_('random.seed', function(s){\n      set.seed(s$random.seed)\n      \n      Estimators$new(\n        beta = .999,\n        dirichlet.alpha = s$dirichlet.alpha,\n        num.theta = s$num.theta,\n        num.actions = s$num.actions,\n        num.states = s$num.states, \n        num.obs = 300\n      ) %>% {\n        .$initializeEstimators() \n        # .$solve_DP_full_timed()\n        .$solve_DP_shape_timed()\n        list(\n          experiment = s,\n          times = .$times\n        )\n      } %>%\n        se(paste(my.trial, s$random.seed, sep ='_'), loc = counterfactualSave)\n    }, .parallel = FALSE)\n}\n\nmemoryTests <- function(){\n  df(\n    dirichlet.alpha = .01,\n    num.theta = 2,\n    num.actions = 2,\n    num.states = 30000\n  ) %>% {\n    Estimators$new(\n      beta = .999,\n      dirichlet.alpha = .$dirichlet.alpha,\n      num.theta = .$num.theta,\n      num.actions = .$num.actions,\n      num.states = .$num.states, \n      num.obs = 300\n    )\n  } %>% {\n    .$initializeEstimators() \n    .$runSNPL()\n    .$runNPL()\n  } \n}\n\ndiscountFactorMispecificationTests <- function(){\n  expand.grid(\n    dirichlet.alpha = .01,\n    num.theta = 2,\n    num.actions = 2,\n    num.states = 1000,\n    beta.real = c(0.99, 1.01),\n    beta.used = c(0.99, 1.01),\n    num.obs = seq(500, 50000, 250)\n  ) %>%\n    mt(\n      random.seed = num.obs,\n      trial = row_number()\n    ) %>% \n    d_('trial', function(s){\n      set.seed(s$random.seed)\n      \n      Estimators$new(\n        beta = s$beta.real,\n        dirichlet.alpha = s$dirichlet.alpha,\n        num.theta = s$num.theta,\n        num.actions = s$num.actions,\n        num.states = s$num.states, \n        num.obs = s$num.obs\n      ) %>% {\n        .$initializeEstimators() \n        .$resetBeta(s$beta.used)\n        .$runSNPL()\n        \n        list(\n          experiment = s,\n          theta = .$theta\n        )\n      } %>%\n        se(s$trial, loc = mispecificationSave)\n    }, .parallel = TRUE)\n}",
+    "created" : 1470612298078.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "385906229",
+    "id" : "61DC68ED",
+    "lastKnownWriteTime" : 1462900405,
+    "last_content_update" : 1462900405,
+    "path" : "~/Dropbox/code/victor/code/modules/RunEstimator.R",
+    "project_path" : "modules/RunEstimator.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

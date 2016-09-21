@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "source('modules/Classes/Estimators.R')\n\nrunEstimators <- function(){\n  my.computer <- 1\n  expand.grid(\n    dirichlet.alpha = c(.01, 1),\n    num.theta = 2,\n    num.actions = c(2, 6),\n    num.states = \n      seq(100, 10000, length.out = 50) %>%\n      as.integer\n  ) %>% \n    mt(random.seed = 10^4 * my.computer + sample(n())) %>%\n    d_('random.seed', function(s){\n      set.seed(s$random.seed)\n      \n      Estimators$new(\n        beta = .999,\n        dirichlet.alpha = s$dirichlet.alpha,\n        num.theta = s$num.theta,\n        num.actions = s$num.actions,\n        num.states = s$num.states, \n        num.obs = 300\n      ) %>% {\n        .$initializeEstimators() \n        if(s$num.states < 2000) .$runNFXP_timed()\n        .$runNPL_timed()\n        .$runNNFXP_timed()\n        .$runNNPL_timed()\n        \n        list(\n          experiment = s,\n          times = .$times,\n          theta = .$theta\n        )\n      } %>%\n        se(s$random.seed, loc = experimentSave)\n    }, .parallel = TRUE)\n}\n\n\n",
+    "created" : 1457895225610.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2523373113",
+    "id" : "513524B6",
+    "lastKnownWriteTime" : 1457919707,
+    "last_content_update" : 1457919707502,
+    "path" : "~/Dropbox/code/victor/code/modules/RunEstimator.R",
+    "project_path" : "modules/RunEstimator.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

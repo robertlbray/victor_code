@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "options(error=NULL)\n# options(error=utils::recover)\n\nlaptop <- getwd() == '/Users/robertbray/Dropbox/code/victor/code'\nif(laptop){\n  data.loc <- '../../../data/victor/'\n  funs.loc <- '../../R/funs/'\n} else {\n  data.loc <- '../data/'\n  funs.loc <- '../funs/'\n  .libPaths('/home/hailphoebus/R/x86_64-redhat-linux-gnu-library/3.2/')\n} \n\nlibrary('plyr')\nl_ply(c('reshape2', 'ggplot2', 'dplyr', 'tidyr', 'stringr', 'doParallel', 'magrittr', 'purrr', 'readr', 'lubridate', 'zoo'), function(l) library(l, character.only=TRUE))\n\ndata.in <- paste0(data.loc, 'input/')\nvarSave <- paste0(data.loc, 'intermediate/variables/')\nexperimentSave <- paste0(data.loc, 'intermediate/experiments/')\nmispecificationSave <- paste0(data.loc, 'intermediate/mispecificationTests/')\ncounterfactualSave <- paste0(data.loc, 'intermediate/counterfactuals/')\ndata.out <- paste0(data.loc, 'output/')\n\nl_ply(dir(funs.loc), function(l) source(paste(funs.loc, l, sep=\"\")))\nl_ply(dir('modules/', recursive = TRUE), function(l) source(paste('modules/', l, sep=\"\")))\nregisterDoParallel(cores=1)\n\n",
+    "created" : 1462991188248.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4278545172",
+    "id" : "71E980BA",
+    "lastKnownWriteTime" : 1462750036,
+    "last_content_update" : 1462750036,
+    "path" : "~/Dropbox/code/victor/code/header.R",
+    "project_path" : "header.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

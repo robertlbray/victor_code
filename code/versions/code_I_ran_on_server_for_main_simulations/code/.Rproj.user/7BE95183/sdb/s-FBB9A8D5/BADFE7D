@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "source('header.R')\n\n###RunEstimator.R\nrunEstimators()\n\n###BasicOutputs.R\n# consolidateResults()\n",
+    "created" : 1457900567667.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3878032574",
+    "id" : "BADFE7D",
+    "lastKnownWriteTime" : 1457905002,
+    "last_content_update" : 1457905002434,
+    "path" : "~/Dropbox/code/victor/code/m.R",
+    "project_path" : "m.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

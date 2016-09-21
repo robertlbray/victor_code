@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "PayoffFunction <- \n  setRefClass(\n    'PayoffFunction',\n    fields = list(\n      payoff.stat = 'list', #list of matricies\n      utility = 'list' #payoff.stat * diag(theta)\n    ),\n    methods = list(\n      createPayoffStats = function(num.states, num.actions, num.theta){\n        #Reads: num.states, num.actions, num.theta (type: integer)\n        #Writes: payoff.stat\n        payoff.stat <<-\n          seq(num.actions) %>%\n          map(\n            ~ rnorm(num.states * num.theta) %>%\n                matrix(num.states)\n          )\n      },\n      \n      updatePayoffs = function(theta){\n        #Payoff vector \\pi_q * \\theta\n        #Reads: c.stat, and theta (type: data.frame)\n        #Writes: theta, cash.flows\n        utility <<-\n          payoff.stat %>%\n          map(~ . %*% theta)\n      }\n    )\n  )",
+    "created" : 1470520659404.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "271226271",
+    "id" : "4A81AA16",
+    "lastKnownWriteTime" : 1457569368,
+    "last_content_update" : 1457569368,
+    "path" : "~/Dropbox/code/victor/code/modules/Classes/PayoffFunction.R",
+    "project_path" : "modules/Classes/PayoffFunction.R",
+    "properties" : {
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

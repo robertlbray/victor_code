@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "Transition <- \n  setRefClass(\n    'Transition',\n    fields = list(\n      num.states = 'numeric',\n      num.actions = 'numeric',\n      dirichlet.alpha = 'numeric',\n      tran.mat = 'list'\n    ),\n    methods = list(\n      calc_transition = function(){\n        #Reads: num.states, num.actions, dirichlet.alpha\n        #Writes: tran.mat\n        library('gtools')\n        tran.mat <<- \n          seq(num.actions) %>%\n          map(~ rdirichlet(n = num.states, alpha = rep(dirichlet.alpha, num.states)))\n      }\n    )\n  )",
+    "created" : 1462900956079.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4012503005",
+    "id" : "FBAF583",
+    "lastKnownWriteTime" : 1457553599,
+    "last_content_update" : 1457553599,
+    "path" : "~/Dropbox/code/victor/code/modules/Classes/Transition.R",
+    "project_path" : "modules/Classes/Transition.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

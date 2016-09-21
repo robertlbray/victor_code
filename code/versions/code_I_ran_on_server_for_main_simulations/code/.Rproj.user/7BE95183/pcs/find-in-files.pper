@@ -1,0 +1,10 @@
+{
+    "dialog-state" : {
+        "caseSensitive" : true,
+        "filePatterns" : [
+        ],
+        "path" : "~/Dropbox/code/victor/code",
+        "query" : "calcPolicyIterationMat",
+        "regex" : false
+    }
+}

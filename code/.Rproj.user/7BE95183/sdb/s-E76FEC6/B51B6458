@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "plotTimes <- function() {\n  le('experiments.rds') %>% \n    fl(num.states < 1000, variable == 'time') %>% \n    mt(\n      newtonless = str_sub(estimator, 1, 2) == 'NN',\n      rust = str_detect(estimator, 'X'),\n      value = value / 60,\n      dirichlet.alpha = setLevels(\n        dirichlet.alpha, \n        c(0.01, 1),\n        c('Sparse Matrix', 'Dense Matrix')\n      ),\n      num.actions = setLevels(\n        num.actions, \n        c(2, 6),\n        c('Two Actions', 'Six Actions')\n      ),\n      rust = setLevels(\n        rust,\n        c(TRUE, FALSE),\n        c('NFXP', 'NPL')\n      ),\n      newtonless = setLevels(\n        newtonless,\n        c(FALSE, TRUE),\n        c('Without Strong Convergence', 'With Strong Convergence')\n      )\n    ) %>% \n    gb(rust, newtonless) %>%\n    mt(value = wins(value, c(0, .99))) %>% {\n      ggplot(\n        data = ., \n        aes(x = num.states, y = value, colour = newtonless)\n      ) + \n        geom_point(size = .75) +\n        geom_smooth(size = .75, se = FALSE) +\n        geom_hline(yintercept = 0, colour = 'black', size = .25) +\n        facet_grid(rust ~ num.actions + dirichlet.alpha, scale = 'free_y') +\n        labs(\n          x = 'Number of States',\n          y = 'Number of Minutes'\n        ) +\n        scale_colour_grey(start = .7, end = 0) +\n        theme(\n          strip.text.x=element_text(size=13.5),\n          strip.text.y=element_text(size=13.5),\n          axis.title.x=element_text(size=15),\n          axis.title.y=element_text(size=15),\n          axis.text.x=element_text(size=11),\n          axis.text.y=element_text(size=11),\n          legend.title=element_text(size=0),\n          legend.text=element_text(size=13.5),\n          panel.grid.major = element_blank(), \n          panel.grid.minor = element_blank(),\n          panel.background=element_rect(fill='white', colour='black'),\n          strip.background = element_rect(colour=\"white\", fill=\"white\"),\n          panel.margin.x = grid::unit(.5, \"cm\"),\n          legend.position = 'top'\n        )\n    } %>% \n    ggsave(plot = ., filename = p0(data.out, \"plots/timesRust.pdf\"), width=9.5, height=10)\n}",
+    "created" : 1465500344172.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "4274100138",
+    "id" : "B51B6458",
+    "lastKnownWriteTime" : 3493725913512425523,
+    "last_content_update" : 1465500365600,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled4"
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "source('modules/Classes/Estimators.R')\n\nrunAnalysis <- function(){\n  my.seed <- 999\n  set.seed(my.seed)\n  expand.grid(\n    dirichlet.alpha = c(.01, 1),\n    num.theta = c(2, 6),\n    num.actions = c(2, 6),\n    num.states = \n      seq(100, 8000, length.out = 200) %>%\n      as.integer\n  ) %>% \n    mt(experiment = sample(n())) %>%\n    d_('experiment', function(s){\n      Estimators$new(\n        beta = .999,\n        dirichlet.alpha = s$dirichlet.alpha,\n        num.theta = s$num.theta,\n        num.actions = s$num.actions,\n        num.states = s$num.states, \n        num.obs = 300\n      ) %>% {\n        .$initializeEstimators() \n        if(s$num.states < 1000) .$runNFXP_timed()\n        if(s$num.states < 4000) .$runNPL_timed()\n        .$runNNFXP_timed()\n        .$runNNPL_timed()\n        \n        list(\n          experiment = s,\n          times = .$times,\n          theta = .$theta\n        )\n      } %>%\n        se(paste(my.seed, s$dirichlet.alpha, s$num.actions, s$num.theta, s$num.states, sep = '_'), loc = experimentSave)\n    }, .parallel = TRUE)\n}\n\n\n",
+    "created" : 1457809655429.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "508810070",
+    "id" : "F3D60539",
+    "lastKnownWriteTime" : 1457845339,
+    "last_content_update" : 1457845339129,
+    "path" : "~/Dropbox/code/victor/code/modules/RunEstimator.R",
+    "project_path" : "modules/RunEstimator.R",
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
