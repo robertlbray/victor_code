@@ -219,10 +219,19 @@ plotCounterfactuals <- function() {
 
 plotTimes <- function() {
   le('experiments.rds') %>% 
-    fl(variable == 'time') %>% 
+    fl(
+      variable == 'time',
+      estimator != 'NNPL'
+    ) %>% 
     mt(
-      newtonless = str_sub(estimator, 1, 2) == 'NN',
-      rust = str_detect(estimator, 'X'),
+      estimator = fct_recode(
+        estimator,
+        'SNFXP' = 'NNFXP'
+      ),
+      estimator = fct_relevel(
+        estimator,
+        'NPL', 'NFXP', 'SNFXP'
+      ), 
       value = value / 60,
       dirichlet.alpha = setLevels(
         dirichlet.alpha, 
@@ -233,33 +242,23 @@ plotTimes <- function() {
         num.actions, 
         c(2, 6),
         c('Two Actions', 'Six Actions')
-      ),
-      rust = setLevels(
-        rust,
-        c(TRUE, FALSE),
-        c('NFXP', 'NPL')
-      ),
-      newtonless = setLevels(
-        newtonless,
-        c(FALSE, TRUE),
-        c('Without Strong Convergence', 'With Strong Convergence')
       )
-    ) %>% 
-    gb(rust, newtonless) %>%
+    ) %>%
+    gb(dirichlet.alpha) %>%
     mt(value = wins(value, c(0, .99))) %>% {
       ggplot(
         data = ., 
-        aes(x = num.states, y = value, colour = newtonless)
+        aes(x = num.states, y = value, colour = estimator)
       ) + 
         geom_point(size = .75) +
         geom_smooth(size = .75, se = FALSE) +
         geom_hline(yintercept = 0, colour = 'black', size = .25) +
-        facet_grid(rust ~ num.actions + dirichlet.alpha, scale = 'free_y') +
+        facet_grid(dirichlet.alpha ~ num.actions, scale = 'free_y') +
         labs(
           x = 'Number of States',
           y = 'Number of Minutes'
         ) +
-        scale_colour_grey(start = .7, end = 0) +
+        scale_colour_grey(start = .8, end = 0) +
         theme(
           strip.text.x=element_text(size=13.5),
           strip.text.y=element_text(size=13.5),

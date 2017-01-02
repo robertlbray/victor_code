@@ -15,7 +15,7 @@ if(laptop){
 .libPaths(my.library)
 
 library('plyr')
-l_ply(c('reshape2', 'ggplot2', 'dplyr', 'tidyr', 'stringr', 'doParallel', 'magrittr', 'purrr', 'readr', 'lubridate', 'zoo'), function(l) library(l, character.only=TRUE))
+l_ply(c('forcats', 'reshape2', 'ggplot2', 'dplyr', 'tidyr', 'stringr', 'doParallel', 'magrittr', 'purrr', 'readr', 'lubridate', 'zoo'), function(l) library(l, character.only=TRUE))
 
 data.in <- paste0(data.loc, 'input/')
 varSave <- paste0(data.loc, 'intermediate/variables/')
@@ -26,5 +26,5 @@ data.out <- paste0(data.loc, 'output/')
 
 l_ply(dir(funs.loc), function(l) source(paste(funs.loc, l, sep="")))
 l_ply(dir('modules/', recursive = TRUE), function(l) source(paste('modules/', l, sep="")))
-registerDoParallel(cores=1)
+registerDoParallel(cores=64)
 

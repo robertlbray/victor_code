@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "***MarcellorunSNPL = function(panel) {\n  delta = 1\n  while(delta > 10^-6){\n    value.fn.prior <- value.fn.saved$value\n    theta %>%\n      un %>% \n      optim(  \n        par = .,\n        method = 'L-BFGS-B',\n        lower = rep(0, 3),\n        control = list(fnscale=-1, factr = 10^-7),\n        fn = function(param){\n          setTheta(param)\n          print(theta)\n          value.fn <<- value.fn.saved\n          runRelativeValueIteration(num.step.limit = 50)\n          evaluateLikelihood()\n        }\n      ) %>% {\n        setTheta(.$par)\n        runRelativeValueIteration()\n        value.fn.saved <<- value.fn\n        print(tl(value.fn))\n      }\n    delta <- max(abs(value.fn.prior - dp$value.fn.saved$value))\n  }\n},\n\n\nrunSNPL = function(num.VI.iters) {\n  SNPL_step <- function(theta) {\n    dp$payoff$updatePayoffs(theta)\n    dp$loadValues()\n    dp$updateValues_VI(use.val.shape = TRUE, num.VI.iters = num.VI.iters)\n    dp$updateCCPs()\n    evaluateLikelihood()\n  }\n  \n  theta$SNPL <<- rep(0, num.theta)\n  dp$resetSystem()\n  delta = 1\n  iter.stop.threshold <- 10^-6\n  while(delta > iter.stop.threshold){\n    value.fn.l <- dp$value.fn\n    \n    theta$SNPL %>% \n      optim(  \n        par = .,\n        method = 'BFGS',\n        control = list(fnscale=-1), #max likelihood\n        fn = SNPL_step\n      ) %>% {\n        theta$SNPL <<- .$par\n        SNPL_step(theta$SNPL) #final run to lock in ``correct\" value\n      }\n    dp$saveValues()\n    delta <- max(abs(value.fn.l - dp$value.fn))\n  }  \n},\n\n\n***set num.step.limit = 10 in updateValues_VI",
+    "created" : 1483059700504.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "3492425308",
+    "id" : "D4B78706",
+    "lastKnownWriteTime" : 4306283616,
+    "last_content_update" : 1483143043182,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled4"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

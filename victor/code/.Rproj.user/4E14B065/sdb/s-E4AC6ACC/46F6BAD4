@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "optim(  \n  par = .,\n  method = 'BFGS',\n  control = list(fnscale=-1), #max likelihood\n  fn = function(theta){\n    dp$payoff$updatePayoffs(theta)\n    dp$updateCCPs()\n    evaluateLikelihood()\n  }\n) %>% {\n  theta$SNPL <<- .$par\n}\ndp$updateValues_VI(use.val.shape = TRUE)\n\n\noptim(  \n  par = .,\n  method = 'BFGS',\n  control = list(fnscale=-1), #max likelihood\n  fn = function(theta){\n    dp$payoff$updatePayoffs(theta)\n    dp$loadValues()\n    dp$updateValues_VI(use.val.shape = TRUE)\n    dp$updateCCPs()\n    evaluateLikelihood()\n  }\n) %>% {\n  theta$SNPL2 <<- .$par\n}",
+    "created" : 1483059005672.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "3390807991",
+    "id" : "46F6BAD4",
+    "lastKnownWriteTime" : 4322303232,
+    "last_content_update" : 1483059019167,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled3"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

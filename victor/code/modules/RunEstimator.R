@@ -7,7 +7,7 @@ runEstimators <- function(){
     num.theta = 2,
     num.actions = c(2, 6),
     num.states = 
-      seq(100, 1000, length.out = 200) %>%
+      seq(100, 110, length.out = 1000) %>%
       as.integer
   ) %>% 
     mt(random.seed = 10^4 * my.computer + sample(n())) %>%
@@ -24,10 +24,9 @@ runEstimators <- function(){
       ) %>% {
         .$initializeEstimators() 
         # if(s$num.states < 3000) .$runNFXP_timed()
-        # .$runNPL_timed()
-        .$runSNFXP_timed()
+        .$runNPL_timed()
+        # .$runSNFXP_timed()
         .$runSNPL_timed()
-        .$runSNPL2_timed()
         list(
           experiment = s,
           times = .$times,
@@ -89,7 +88,7 @@ memoryTests <- function(){
     )
   } %>% {
     .$initializeEstimators() 
-    .$runSNPL()
+    .$runSNPL(num.VI.iters = 1)
     .$runNPL()
   } 
 }
@@ -121,7 +120,7 @@ discountFactorMispecificationTests <- function(){
       ) %>% {
         .$initializeEstimators() 
         .$resetBeta(s$beta.used)
-        .$runSNPL()
+        .$runSNPL(num.VI.iters = 1)
         
         list(
           experiment = s,

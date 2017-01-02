@@ -1,10 +1,10 @@
 source('header.R')
 
 ###RunEstimator.R
-# runEstimators()
+runEstimators()
 # memoryTests()
 # discountFactorMispecificationTests()
-counterfactualAnalysis()
+# counterfactualAnalysis()
 
 ###BasicOutputs.R
 # consolidateResults()

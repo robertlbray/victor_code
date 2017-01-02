@@ -4,6 +4,7 @@ Estimators <-
   setRefClass(
     'Estimators',
     fields = list(
+      iter.stop.threshold = 'numeric',
       beta = 'numeric',
       num.theta = 'numeric',
       num.states = 'numeric',
@@ -20,6 +21,8 @@ Estimators <-
         times <<- as.list(NULL)
         theta <<- as.list(NULL)
         theta$true <<- rnorm(num.theta)
+        
+        iter.stop.threshold <<- 10^-9
         
         dp <<- 
           DPEngine$new(
@@ -72,7 +75,7 @@ Estimators <-
                 action = l
               )
           }) %>%
-          ij(panel) %>% 
+          ij(panel, by = c('state', 'action')) %>% 
           sm(sum(n * log(CCP))) %>% 
           un
       },
@@ -110,10 +113,23 @@ Estimators <-
       },
       
       runNPL = function() {
+        
+        ####NOTE: The monte carlo simulation ran from a previous version. That version is in versions/Econmetrica_submission. It didn't include the final NPL_step(theta$NPL) call before the dp$saveCCPs() line. 
+        ####Also, I canged the definition of SNPL since then. But SNPL doesn't ever converge to something nice, so I'm dropping it.
+        
+        NPL_step <- function(theta) {
+          dp$payoff$updatePayoffs(theta)
+          dp$loadCCPs()
+          dp$operator_PI()
+        }
+        
         theta$NPL <<- rep(0, num.theta)
         dp$resetSystem()
         dp$estimateInitialCCPs(panel)
-        nestedPsuedoLikelihoodStep <- function(){
+        delta = 1
+        while(delta > iter.stop.threshold){
+          value.fn.l <- dp$value.fn
+          
           dp$calcPolicyIterationMat()
           theta$NPL %>% 
             optim(  
@@ -121,123 +137,50 @@ Estimators <-
               method = 'BFGS',
               control = list(fnscale=-1), #max likelihood
               fn = function(theta){
-                dp$payoff$updatePayoffs(theta)
-                dp$loadCCPs()
-                dp$operator_PI()
+                NPL_step(theta)
                 evaluateLikelihood()
               }
             ) %>% {
               theta$NPL <<- .$par
             }
+          
+          NPL_step(theta$NPL)
           dp$saveCCPs()
-        }
-        delta = 1
-        iter.stop.threshold <- 10^-10
-        while(max(delta) > iter.stop.threshold){
-          CCP.l <- dp$CCP
-          nestedPsuedoLikelihoodStep()
-          delta <- 
-            map2(dp$CCP, CCP.l, ~ max(abs(.x - .y))) %>%
-            unlist %>%
-            max
+          delta <- max(abs(value.fn.l - dp$value.fn))
         }
       },
       
       runSNPL = function() {
+        SNPL_step <- function(theta) {
+          dp$payoff$updatePayoffs(theta)
+          dp$loadValues()
+          dp$loadCCPs()
+          updateValues_VI(use.val.shape)
+          updateCCPs()
+        }
+        
         theta$SNPL <<- rep(0, num.theta)
         dp$resetSystem()
-        nestedPsuedoLikelihoodStep <- function(){
+        delta = 1
+        while(delta > iter.stop.threshold){
+          value.fn.l <- dp$value.fn
           theta$SNPL %>% 
             optim(  
               par = .,
               method = 'BFGS',
               control = list(fnscale=-1), #max likelihood
               fn = function(theta){
-                dp$payoff$updatePayoffs(theta)
-                dp$updateCCPs()
+                SNPL_step(theta)
                 evaluateLikelihood()
               }
             ) %>% {
               theta$SNPL <<- .$par
             }
-          dp$updateValues_VI(use.val.shape = TRUE)
-        }
-        iter.stop.threshold <- 10^-6
-        delta = 1
-        while(max(delta) > iter.stop.threshold){
-          value.fn.l <- dp$value.fn
-          nestedPsuedoLikelihoodStep()
-          delta <- max(abs(value.fn.l - dp$value.fn))
-        }
-        
-        theta$SNPL %>% #One final run for accuracy
-          optim(  
-            par = .,
-            method = 'BFGS',
-            control = list(fnscale=-1), #max likelihood
-            fn = function(theta){
-              dp$solve_DP_shape(theta)
-              evaluateLikelihood()
-            }
-          ) %>% {
-            theta$SNPL <<- .$par
-          }
-      },
-      
-      runSNPL2 = function() {
-        theta$SNPL2 <<- rep(0, num.theta)
-        dp$resetSystem()
-        nestedPsuedoLikelihoodStep <- function(){
-          theta$SNPL2 %>% 
-            optim(  
-              par = .,
-              method = 'BFGS',
-              control = list(fnscale=-1), #max likelihood
-              fn = function(theta){
-                dp$payoff$updatePayoffs(theta)
-                dp$loadValues()
-                dp$updateValues_VI(use.val.shape = TRUE)
-                dp$updateCCPs()
-                evaluateLikelihood()
-              }
-            ) %>% {
-              theta$SNPL2 <<- .$par
-            }
+          SNPL_step(theta$SNPL)
           dp$saveValues()
-          
-          
-          
-          
-          
-          
-          #####NOTE!!!!
-          ####I think there is a bug here, which I fix in marcello.R. The final evaluation of the maximizer probably wont be the maximizing value. So I'm saving the wrong number! I haven't fixed this bug, because I don't want to change the code, but I think the "One final run for accuracy" part might be redundant after I fix it.
-          
-          
-          
-          
-          
-        }
-        iter.stop.threshold <- 10^-6
-        delta = 1
-        while(max(delta) > iter.stop.threshold){
-          value.fn.l <- dp$value.fn
-          nestedPsuedoLikelihoodStep()
+          dp$saveCCPs()
           delta <- max(abs(value.fn.l - dp$value.fn))
         }
-        
-        theta$SNPL2 %>% #One final run for accuracy
-          optim(  
-            par = .,
-            method = 'BFGS',
-            control = list(fnscale=-1), #max likelihood
-            fn = function(theta){
-              dp$solve_DP_shape(theta)
-              evaluateLikelihood()
-            }
-          ) %>% {
-            theta$SNPL2 <<- .$par
-          }
       },
       
       runNFXP_timed = function(){
@@ -254,10 +197,6 @@ Estimators <-
       
       runSNPL_timed = function(){
         times$SNPL <<- system.time(runSNPL())
-      },
-      
-      runSNPL2_timed = function(){
-        times$SNPL2 <<- system.time(runSNPL2())
       },
       
       solve_DP_shape_timed = function(){

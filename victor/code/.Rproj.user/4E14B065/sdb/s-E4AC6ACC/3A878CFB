@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library('Matrix')\n\nseq(3000, 4000, 250) %>% \n  map(function(N){\n    A <- matrix(rnorm(N^2), N)\n    df(\n      N = N,\n      LU = system.time({\n        plu <-\n          A %>% \n          lu %>% \n          expand\n      }) %>% \n      {.[3]},\n      inverse = system.time({\n        solve(A)\n      }) %>% \n      {.[3]}  \n    )\n  }\n)\n\n\nN = 5\nD = diag(5); D[, 1] = -1; D[1, 1] = 0\nF = matrix(runif(N^2), N) %>% {./rowSums(.)}\nbeta = .9\n\nsolve(diag(N) - beta * F)\ncount = 0\nA = diag(N)\n\n\nA = diag(N) + beta * F %*% A\ncount = count + 1\nA\n\n\n\n\nsolve(diag(N) - beta *D %*% F %*% D)\ncount = 0\nA = diag(N)\n\n\nA = diag(N) + beta * D %*% F %*% D %*% A\ncount = count + 1\nA\n\n\n\n\n",
+    "created" : 1483308217785.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "436795467",
+    "id" : "3A878CFB",
+    "lastKnownWriteTime" : 3196183682360541190,
+    "last_content_update" : 1483321153908,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled6"
+    },
+    "relative_order" : 10,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
